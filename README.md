@@ -1,4 +1,5 @@
 # mnotes
+<<<<<<< HEAD
 
 A new Flutter project.
 
@@ -15,3 +16,6 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+Mobile Apps 
+>>>>>>> b624fe146c684c9fb3bd3ea389e6982bf143c217
