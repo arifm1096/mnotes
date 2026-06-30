@@ -19,6 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
+  # sdk: ">=3.0.0 <4.0.0"
   sdk: ^3.11.5
 
 # Dependencies specify other packages that your package needs in order to work.
@@ -34,6 +35,7 @@ dependencies:
   hive : ^2.2.3
   hive_flutter: ^1.1.0
   uuid : ^4.5.1
+  intl: ^0.20.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

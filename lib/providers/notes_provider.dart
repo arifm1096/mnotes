@@ -25,10 +25,15 @@ class NotesNotifier extends StateNotifier<List<NoteModel>> {
     state = notes;
   }
 
-  Future<void> addNote(String title, String content) async {
+  Future<bool> addNote(String title, String content) async {
     print('SAVE NOTE');
     print('Title: $title');
     print('Content: $content');
+
+    if (title == '' || content == '') {
+      return false;
+    }
+
     final note = NoteModel(
       id: const Uuid().v4(),
       title: title,
@@ -40,6 +45,7 @@ class NotesNotifier extends StateNotifier<List<NoteModel>> {
     await storage.saveNote(note);
     print('Data berhasil disimpan');
     await loadNotes();
+    return true;
   }
 
   Future<void> updateNote(NoteModel note) async {

@@ -1,30 +1,30 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mnotes/main.dart';
+import 'package:mnotes/data/models/note_model.dart';
+import 'package:mnotes/features/notes/pages/notes_page.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  test('filterNotesByKeyword matches title and content', () {
+    final notes = [
+      NoteModel(
+        id: '1',
+        title: 'Belajar Flutter',
+        content: 'Membuat UI yang rapi',
+        createdAt: DateTime(2024, 1, 1),
+        updateAt: DateTime(2024, 1, 1),
+      ),
+      NoteModel(
+        id: '2',
+        title: 'Belanja',
+        content: 'Beli kopi dan roti',
+        createdAt: DateTime(2024, 1, 2),
+        updateAt: DateTime(2024, 1, 2),
+      ),
+    ];
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    final filtered = filterNotesByKeyword(notes, 'kopi');
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(filtered, hasLength(1));
+    expect(filtered.first.id, '2');
   });
 }
