@@ -148,8 +148,6 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                 child: filteredNotes.isEmpty
                     ? Center(child: nullCards())
                     : ListView.builder(
-                        // TIDAK reverse: index 0 (note terbaru) selalu
-                        // dirender paling atas, sesuai urutan asli list.
                         padding: const EdgeInsets.only(top: 4, bottom: 24),
                         itemCount: filteredNotes.length,
                         itemBuilder: (context, index) {
@@ -210,6 +208,8 @@ class _NotesPageState extends ConsumerState<NotesPage> {
               ),
             ),
           ],
+
+     
         ),
       ),
     );
