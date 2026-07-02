@@ -56,7 +56,6 @@ class _NotesPageState extends ConsumerState<NotesPage> {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            // HARD SHADOW (blok hitam solid di belakang, bukan blur)
             Positioned(
               left: shadowOffset,
               top: shadowOffset,
@@ -74,7 +73,10 @@ class _NotesPageState extends ConsumerState<NotesPage> {
               decoration: BoxDecoration(
                 color: const Color(0xFF6FA8FF),
                 borderRadius: BorderRadius.circular(1.0),
-                border: Border.all(color: const Color.fromARGB(255, 0, 0, 0), width: 1),
+                border: Border.all(
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                  width: 1,
+                ),
               ),
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,33 +164,52 @@ class _NotesPageState extends ConsumerState<NotesPage> {
           ),
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   child: const Icon(Icons.add),
-      //   onPressed: () {
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (_) => const AddNotePage()),
-      //     );
-      //   },
-      // ),
       bottomNavigationBar: Container(
+        margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
         height: 70,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.shade300)),
-        ),
-        child: Center(
-         child: IconButton(
-            color: Colors.black,
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AddNotePage()),
-              );
-            },
+          color: const Color(0xFFFDE7D4),
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 5),
             ),
+          ],
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            Positioned(
+              top: -25,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AddNotePage()),
+                  );
+                },
+                child: Container(
+                  width: 65,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFA1FF8D),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.add, color: Color.fromARGB(255, 0, 0, 0), size: 35),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
