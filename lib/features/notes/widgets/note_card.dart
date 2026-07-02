@@ -147,31 +147,38 @@ class NoteCard extends ConsumerWidget {
                           builder: (context) {
                             return AlertDialog(
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(1.0),
                                 side: const BorderSide(
                                   color: borderColor,
                                   width: 2,
                                 ),
                               ),
                               title: const Text(
-                                'Hapus Catatan',
+                                'Anda Yakin Hapus ?',
                                 style: TextStyle(fontWeight: FontWeight.w800),
                               ),
-                              content: const Text(
-                                'Apakah Anda yakin ingin menghapus catatan ini?',
-                              ),
+                              content: Text(note.title),
                               actions: [
                                 TextButton(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.grey.shade700,
+                                  ),
                                   onPressed: () {
                                     Navigator.pop(context, false);
                                   },
                                   child: const Text('Batal'),
                                 ),
                                 ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                  ),
                                   onPressed: () {
                                     Navigator.pop(context, true);
                                   },
-                                  child: const Text('Hapus'),
+                                  child: const Text(
+                                    'Hapus',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
                               ],
                             );

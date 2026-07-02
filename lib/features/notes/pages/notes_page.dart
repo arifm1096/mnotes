@@ -74,7 +74,10 @@ class _NotesPageState extends ConsumerState<NotesPage> {
               decoration: BoxDecoration(
                 color: const Color(0xFF6FA8FF),
                 borderRadius: BorderRadius.circular(1.0),
-                border: Border.all(color: const Color.fromARGB(255, 0, 0, 0), width: 1),
+                border: Border.all(
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                  width: 1,
+                ),
               ),
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,8 +149,6 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                 child: filteredNotes.isEmpty
                     ? Center(child: nullCards())
                     : ListView.builder(
-                        // TIDAK reverse: index 0 (note terbaru) selalu
-                        // dirender paling atas, sesuai urutan asli list.
                         padding: const EdgeInsets.only(top: 4, bottom: 24),
                         itemCount: filteredNotes.length,
                         itemBuilder: (context, index) {
@@ -162,33 +163,29 @@ class _NotesPageState extends ConsumerState<NotesPage> {
           ),
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   child: const Icon(Icons.add),
-      //   onPressed: () {
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (_) => const AddNotePage()),
-      //     );
-      //   },
-      // ),
-      bottomNavigationBar: Container(
-        height: 70,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.shade300)),
-        ),
-        child: Center(
-         child: IconButton(
-            color: Colors.black,
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AddNotePage()),
-              );
-            },
+
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(9.0),
+        child: Container(
+          height: 80,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: Colors.grey.shade300)),
+          ),
+          child: Center(
+            child: IconButton(
+              color: Colors.black,
+              icon: const Icon(Icons.add_circle_outline_rounded),
+              iconSize: 50,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddNotePage()),
+                );
+              },
             ),
+          ),
         ),
       ),
     );
