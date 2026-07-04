@@ -100,7 +100,8 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
+      extendBody: true,
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         title: const Text(
           'My Notes',
@@ -126,7 +127,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                 child: Container(
                   height: 45,
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 218, 217, 217),
+                    color: const Color.fromARGB(255, 240, 197, 141),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: TextField(
@@ -136,9 +137,9 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                     },
                     decoration: const InputDecoration(
                       border: InputBorder.none,
-                      prefixIcon: Icon(Icons.search, color: Colors.grey),
+                      prefixIcon: Icon(Icons.search, color: Color.fromARGB(255, 65, 65, 65)),
                       hintText: 'Search',
-                      hintStyle: TextStyle(color: Colors.grey),
+                      hintStyle: TextStyle(color: Color.fromARGB(255, 65, 65, 65)),
                     ),
                   ),
                 ),
@@ -162,54 +163,50 @@ class _NotesPageState extends ConsumerState<NotesPage> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-        height: 70,
-        decoration: BoxDecoration(
-          color: const Color(0xFFFDE7D4),
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 20,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.center,
-          children: [
-            Positioned(
-              top: -25,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AddNotePage()),
-                  );
-                },
-                child: Container(
-                  width: 65,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFA1FF8D),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 15,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
+      bottomNavigationBar: Material(
+        type:
+            MaterialType.transparency, // ini kuncinya, bikin beneran transparan
+        child: Container(
+          margin: const EdgeInsets.only(left: 10, right: 10, bottom: 20),
+          height: 70,
+          decoration: BoxDecoration(
+            color: const Color(0xFF90D5FF),
+            borderRadius: BorderRadius.circular(30),
+            
+          ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                top: -20,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AddNotePage()),
+                    );
+                  },
+                  child: Container(
+                    width: 65,
+                    height: 65,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFA1FF8D),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 15,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.add, color: Colors.black, size: 35),
                   ),
-                  child: const Icon(Icons.add, color: Color.fromARGB(255, 0, 0, 0), size: 35),
                 ),
               ),
-            ),
-          ],
-
-     
+            ],
+          ),
         ),
       ),
     );
