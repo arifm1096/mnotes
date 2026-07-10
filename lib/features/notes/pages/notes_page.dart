@@ -164,14 +164,14 @@ class _NotesPageState extends ConsumerState<NotesPage> {
         ),
       ),
       bottomNavigationBar: Material(
-        type:
-            MaterialType.transparency, // ini kuncinya, bikin beneran transparan
+        type: MaterialType.transparency, // ini kuncinya, bikin beneran transparan
         child: Container(
           margin: const EdgeInsets.only(left: 10, right: 10, bottom: 20),
-          height: 70,
+          height: 60,
           decoration: BoxDecoration(
             color: const Color(0xFF90D5FF),
             borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: Colors.black, width: 3.0),
             
           ),
           child: Stack(
@@ -188,8 +188,8 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                     );
                   },
                   child: Container(
-                    width: 65,
-                    height: 65,
+                    width: 60,
+                    height: 60,
                     decoration: BoxDecoration(
                       color: const Color(0xFFA1FF8D),
                       shape: BoxShape.circle,
@@ -200,6 +200,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                           offset: const Offset(0, 5),
                         ),
                       ],
+                      border: Border.all(color: Colors.black, width: 2.0),
                     ),
                     child: const Icon(Icons.add, color: Colors.black, size: 35),
                   ),
