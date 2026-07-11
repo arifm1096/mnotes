@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../../../data/models/note_model.dart';
 import '../../../providers/notes_provider.dart';
 
 class AddNotePage extends ConsumerStatefulWidget {
-  const AddNotePage({super.key});
+  final NoteModel? note;
+  const AddNotePage({super.key, this.note});
 
   @override
   ConsumerState<AddNotePage> createState() => _AddNotePageState();
@@ -13,6 +14,15 @@ class AddNotePage extends ConsumerStatefulWidget {
 class _AddNotePageState extends ConsumerState<AddNotePage> {
   final titleController = TextEditingController();
   final contentController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.note != null) {
+      titleController.text = widget.note!.title;
+      contentController.text = widget.note!.content;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,9 +129,18 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
             /// Tombol simpan tetap menggunakan fungsi lama
             IconButton(
               onPressed: () async {
-                await ref
-                    .read(notesProvider.notifier)
-                    .addNote(titleController.text, contentController.text);
+                if (widget.note == null) {
+                  await ref
+                      .read(notesProvider.notifier)
+                      .addNote(titleController.text, contentController.text);
+                } else {
+                  widget.note!.title = titleController.text;
+                  widget.note!.content = contentController.text;
+
+                  await ref
+                      .read(notesProvider.notifier)
+                      .updateNote(widget.note!);
+                }
 
                 if (mounted) {
                   Navigator.pop(context);
