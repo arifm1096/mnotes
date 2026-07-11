@@ -120,6 +120,18 @@ class _NotesPageState extends ConsumerState<NotesPage> {
           child: Column(
             children: [
               const SizedBox(height: 10),
+              Positioned(
+                left: 0.5,
+                top: 0.5,
+                right: -0.5,
+                bottom: -0.5,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(1.0),
+                  ),
+                ),
+              ),
 
               /// SEARCH
               Padding(
@@ -129,6 +141,16 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 240, 197, 141),
                     borderRadius: BorderRadius.circular(30),
+                    border: Border.fromBorderSide(
+                      BorderSide(color: Colors.black, width: 2),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        offset: Offset(0, 2),
+                        blurRadius: 4,
+                      ),
+                    ],
                   ),
                   child: TextField(
                     controller: searchController,
@@ -137,9 +159,14 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                     },
                     decoration: const InputDecoration(
                       border: InputBorder.none,
-                      prefixIcon: Icon(Icons.search, color: Color.fromARGB(255, 65, 65, 65)),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Color.fromARGB(255, 65, 65, 65),
+                      ),
                       hintText: 'Search',
-                      hintStyle: TextStyle(color: Color.fromARGB(255, 65, 65, 65)),
+                      hintStyle: TextStyle(
+                        color: Color.fromARGB(255, 65, 65, 65),
+                      ),
                     ),
                   ),
                 ),
@@ -163,50 +190,29 @@ class _NotesPageState extends ConsumerState<NotesPage> {
           ),
         ),
       ),
-      bottomNavigationBar: Material(
-        type: MaterialType.transparency, // ini kuncinya, bikin beneran transparan
-        child: Container(
-          margin: const EdgeInsets.only(left: 10, right: 10, bottom: 20),
-          height: 60,
-          decoration: BoxDecoration(
-            color: const Color(0xFF90D5FF),
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.black, width: 3.0),
-            
-          ),
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.center,
-            children: [
-              Positioned(
-                top: -20,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const AddNotePage()),
-                    );
-                  },
-                  child: Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFA1FF8D),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
-                          blurRadius: 15,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                      border: Border.all(color: Colors.black, width: 2.0),
-                    ),
-                    child: const Icon(Icons.add, color: Colors.black, size: 35),
-                  ),
-                ),
+
+      // FAB
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: SizedBox(
+        width: 170,
+        height: 50,
+        child: Center(
+          child: FloatingActionButton.extended(
+            onPressed: () {
+              GORouter.of(context).go('/add-note');
+            },
+            backgroundColor: Colors.black,
+            elevation: 8,
+            shape: const StadiumBorder(),
+            icon: const Icon(Icons.add, color: Colors.white),
+            label: const Text(
+              "Add Note",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
               ),
-            ],
+            ),
           ),
         ),
       ),
