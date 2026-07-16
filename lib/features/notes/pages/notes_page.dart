@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:go_router/go_router.dart';
 import '../../../data/models/note_model.dart';
 import '../../../providers/notes_provider.dart';
 import '../../../providers/search_provider.dart';
@@ -199,7 +199,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
         child: Center(
           child: FloatingActionButton.extended(
             onPressed: () {
-              GORouter.of(context).go('/add-note');
+              context.go("/add-note");
             },
             backgroundColor: Colors.black,
             elevation: 8,
