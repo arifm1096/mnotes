@@ -199,7 +199,10 @@ class _NotesPageState extends ConsumerState<NotesPage> {
         child: Center(
           child: FloatingActionButton.extended(
             onPressed: () {
-              context.go("/add-note");
+              context.push(
+                '/add_note',
+                extra: AddNotePageArguments(note: null, isEditing: false),
+              );
             },
             backgroundColor: Colors.black,
             elevation: 8,
