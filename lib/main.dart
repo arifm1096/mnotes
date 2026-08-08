@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mnotes/core/router.dart';
 import 'core/app_theme.dart';
-import 'core/router.dart';
 import 'data/models/note_model.dart';
-// import 'features/notes/pages/notes_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,11 +20,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       title: 'Notes App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const NotesPage(),
     );
   }
 }

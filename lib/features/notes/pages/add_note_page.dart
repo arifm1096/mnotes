@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../data/models/note_model.dart';
 import '../../../providers/notes_provider.dart';
 
@@ -35,7 +36,7 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Color(0xffd4af37)),
           onPressed: () {
-            Navigator.pop(context);
+            context.go('/');
           },
         ),
         actions: [
@@ -143,7 +144,8 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
                 }
 
                 if (mounted) {
-                  Navigator.pop(context);
+                  // ignore: use_build_context_synchronously
+                  context.go('/');
                 }
               },
               icon: const Icon(Icons.done, color: Color(0xffd4af37)),

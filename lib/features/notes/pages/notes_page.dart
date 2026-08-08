@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mnotes/features/notes/widgets/search.dart';
 import '../../../data/models/note_model.dart';
 import '../../../providers/notes_provider.dart';
 import '../../../providers/search_provider.dart';
 import '../widgets/note_card.dart';
-import 'add_note_page.dart';
 
 List<NoteModel> filterNotesByKeyword(List<NoteModel> notes, String keyword) {
   final query = keyword.toLowerCase();
@@ -47,7 +47,6 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 
     Widget nullCards() {
       const borderColor = Colors.black;
-      const borderWidth = 2.5;
       const radius = 0.1;
       const shadowOffset = 5.0;
 
@@ -134,43 +133,8 @@ class _NotesPageState extends ConsumerState<NotesPage> {
               ),
 
               /// SEARCH
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 240, 197, 141),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.fromBorderSide(
-                      BorderSide(color: Colors.black, width: 2),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        offset: Offset(0, 2),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: searchController,
-                    onChanged: (value) {
-                      ref.read(searchProvider.notifier).state = value;
-                    },
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Color.fromARGB(255, 65, 65, 65),
-                      ),
-                      hintText: 'Search',
-                      hintStyle: TextStyle(
-                        color: Color.fromARGB(255, 65, 65, 65),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              SearchWidget(searchController: searchController),
+              
               const SizedBox(height: 10),
               Expanded(
                 child: filteredNotes.isEmpty
@@ -199,12 +163,9 @@ class _NotesPageState extends ConsumerState<NotesPage> {
         child: Center(
           child: FloatingActionButton.extended(
             onPressed: () {
-              context.push(
-                '/add_note',
-                extra: AddNotePageArguments(note: null, isEditing: false),
-              );
+              context.go('/note-add');
             },
-            backgroundColor: Colors.black,
+            backgroundColor: const Color.fromARGB(255, 44, 113, 216),
             elevation: 8,
             shape: const StadiumBorder(),
             icon: const Icon(Icons.add, color: Colors.white),

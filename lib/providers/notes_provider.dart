@@ -19,16 +19,10 @@ class NotesNotifier extends StateNotifier<List<NoteModel>> {
 
   Future<void> loadNotes() async {
     final notes = await storage.getNotes();
-    print('LOAD NOTES');
-    print(notes.length);
-
     state = notes;
   }
 
   Future<bool> addNote(String title, String content) async {
-    print('SAVE NOTE');
-    print('Title: $title');
-    print('Content: $content');
 
     if (title == '' || content == '') {
       return false;
@@ -43,22 +37,18 @@ class NotesNotifier extends StateNotifier<List<NoteModel>> {
     );
 
     await storage.saveNote(note);
-    print('Data berhasil disimpan');
     await loadNotes();
     return true;
   }
 
   Future<void> updateNote(NoteModel note) async {
     note.updateAt = DateTime.now();
-
     await storage.saveNote(note);
-
     await loadNotes();
   }
 
   Future<void> deleteNote(String id) async {
     await storage.deleteNote(id);
-
     await loadNotes();
   }
 }
