@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mnotes/features/notes/widgets/iklan_banner.dart';
 import 'package:mnotes/features/notes/widgets/search.dart';
 import '../../../data/models/note_model.dart';
 import '../../../providers/notes_provider.dart';
@@ -18,8 +19,6 @@ List<NoteModel> filterNotesByKeyword(List<NoteModel> notes, String keyword) {
   }).toList();
 }
 
-/// Urutkan note dari yang paling baru dibuat ke yang paling lama,
-/// supaya note terbaru selalu tampil paling atas.
 List<NoteModel> sortNotesByNewest(List<NoteModel> notes) {
   final sorted = [...notes];
   sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -99,7 +98,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      extendBody: true,
+      extendBody: false,
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         title: const Text(
@@ -119,22 +118,9 @@ class _NotesPageState extends ConsumerState<NotesPage> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-              Positioned(
-                left: 0.5,
-                top: 0.5,
-                right: -0.5,
-                bottom: -0.5,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(1.0),
-                  ),
-                ),
-              ),
 
-              /// SEARCH
               SearchWidget(searchController: searchController),
-              
+
               const SizedBox(height: 10),
               Expanded(
                 child: filteredNotes.isEmpty
@@ -155,29 +141,78 @@ class _NotesPageState extends ConsumerState<NotesPage> {
         ),
       ),
 
-      // FAB
+      // Konfigurasi FAB yang baru
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: SizedBox(
-        width: 170,
-        height: 50,
-        child: Center(
-          child: FloatingActionButton.extended(
-            onPressed: () {
+      // ✅ 1. BUNGKUS FAB DENGAN PADDING AGAR NAIK SEDIKIT DARI IKLAN
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 10.0),
+        child: SizedBox(
+          width: 145,
+          height: 50,
+          child: InkWell(
+            onTap: () {
               context.go('/note-add');
             },
-            backgroundColor: const Color.fromARGB(255, 44, 113, 216),
-            elevation: 8,
-            shape: const StadiumBorder(),
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text(
-              "Add Note",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
+            child: Stack(
+              children: [
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  top: 3,
+                  left: 3,
+                  child: Container(
+                    width: 140,
+                    height: 47,
+                    decoration: const BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.zero,
+                    ),
+                  ),
+                ),
+                // Lapisan Konten Utama (Kotak Biru)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                    width: 140,
+                    height: 47,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF7CB46),
+                      borderRadius: BorderRadius.zero,
+                      border: Border.all(color: Colors.black, width: 2),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: const [
+                        Icon(Icons.add, color: Colors.black, size: 25),
+                        SizedBox(width: 8.0),
+                        Expanded(
+                          child: Text(
+                            "Add Notes",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
+        ),
+      ),
+
+      // ✅ 2. KUNCI TINGGI BOTTOM NAVIGATION BAR
+      bottomNavigationBar: const SafeArea(
+        child: SizedBox(
+          height:
+              55, // Standar tinggi banner AdMob, mengunci ruang agar UI tidak crash
+          child: IklanBanner(),
         ),
       ),
     );

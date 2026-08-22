@@ -11,7 +11,7 @@ class SearchWidget extends ConsumerWidget {
   static const borderRadius = 1.0; // Gunakan radius sudut yang wajar
 
   // Perbaikan Konstruktor untuk menggunakan 'this'
-  SearchWidget({super.key, required this.searchController});
+  const SearchWidget({super.key, required this.searchController});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,7 +20,7 @@ class SearchWidget extends ConsumerWidget {
       child: Container(
         height: 50, // Sesuaikan tinggi sesuai keinginan Anda
         decoration: BoxDecoration(
-          color: Colors.pinkAccent, // Gunakan warna pink cerah sesuai gambar
+          color: const Color(0xFFF7CB46), // Gunakan warna pink cerah sesuai gambar
           borderRadius: BorderRadius.circular(borderRadius),
           border: Border.all(color: Colors.black, width: 2), // Border hitam pekat
           boxShadow: [

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mnotes/features/notes/widgets/iklan_banner.dart';
+import 'package:mnotes/features/notes/widgets/note_bottom_bar.dart';
 import '../../../data/models/note_model.dart';
 import '../../../providers/notes_provider.dart';
 
 class AddNotePage extends ConsumerStatefulWidget {
   final NoteModel? note;
-  const AddNotePage({super.key, this.note});
+  final String? id;
+  const AddNotePage({super.key, this.note,this.id});
 
   @override
   ConsumerState<AddNotePage> createState() => _AddNotePageState();
@@ -25,31 +28,113 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
     }
   }
 
+  void _loadExistingNote() {
+    if(widget.id != null && widget.id != 'new') {
+      final notes = ref.read(notesProvider);
+
+      try {
+        existingNote = notes.fir
+      } catch (e) {
+        
+      }
+    }
+  }
+
+  void _insertBullet() {
+    final text = contentController.text;
+    final selection = contentController.selection;
+    String bulletText = '• ';
+
+    if (selection.baseOffset != -1) {
+      final start = selection.start;
+      final end = selection.end;
+      if (start > 0 && text[start - 1] != '\n') {
+        bulletText = '\n';
+      }
+      final newText = text.replaceRange(start, end, bulletText);
+      contentController.value = contentController.value.copyWith(
+        text: newText,
+        selection: TextSelection.collapsed(offset: start + bulletText.length),
+      );
+    }
+  }
+
+  Future<void> _saveNote() async {
+    // 1. Tutup keyboard terlebih dahulu untuk mencegah UI freeze saat pindah halaman
+    FocusScope.of(context).unfocus();
+
+    // 2. (Opsional) Validasi: Jangan simpan jika judul dan isi kosong
+    if (titleController.text.trim().isEmpty &&
+        contentController.text.trim().isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Judul atau isi catatan tidak boleh kosong'),
+          ),
+        );
+      }
+      return; // Hentikan fungsi di sini
+    }
+
+    try {
+      if (widget.note == null) {
+        // Tambah Catatan Baru
+        await ref
+            .read(notesProvider.notifier)
+            .addNote(titleController.text, contentController.text);
+      } else {
+        // Update Catatan Lama
+        widget.note!.title = titleController.text;
+        widget.note!.content = contentController.text;
+        await ref.read(notesProvider.notifier).updateNote(widget.note!);
+      }
+
+      // 3. Jika berhasil menyimpan, kembali ke halaman utama
+      if (mounted) {
+        context.go('/');
+      }
+    } catch (e) {
+      // 4. Tangkap error jika Hive / Provider bermasalah
+      print("🚨 ERROR SAAT MENYIMPAN: $e");
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Gagal menyimpan catatan: $e')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    const _colorIcon = Color(0xFFF7CB46); // Warna emas untuk ikon
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 136, 155, 133),
         elevation: 0,
         surfaceTintColor: Colors.white,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(3.0),
+          child: Container(color: Colors.black, height: 3.0),
+        ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xffd4af37)),
+          icon: const Icon(Icons.arrow_back_ios, color: _colorIcon),
           onPressed: () {
             context.go('/');
           },
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.push_pin_outlined, color: Color(0xffd4af37)),
+            icon: const Icon(Icons.push_pin_outlined, color: _colorIcon),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.share_outlined, color: Color(0xffd4af37)),
+            icon: const Icon(Icons.share_outlined, color: _colorIcon),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.more_horiz, color: Color(0xffd4af37)),
+            icon: const Icon(Icons.more_horiz, color: _colorIcon),
             onPressed: () {},
           ),
         ],
@@ -61,12 +146,28 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-              Text(
-                '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: _colorIcon,
+                  border: Border.all(color: Colors.black, width: 2),
+                  boxShadow: const [
+                    BoxShadow(color: Colors.black, offset: Offset(3, 3)),
+                  ],
+                ),
+                child: Text(
+                  '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 14, 13, 13),
+                    fontSize: 14,
+                    fontFamily: 'Roboto',
+                  ),
+                ),
               ),
               const SizedBox(height: 15),
-
               /// Judul
               TextField(
                 controller: titleController,
@@ -76,8 +177,8 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
                 ),
                 decoration: const InputDecoration(
                   hintText: 'Title',
+                  hintStyle: TextStyle(color: Colors.black38),
                   border: InputBorder.none,
-                  isDense: true,
                 ),
               ),
 
@@ -91,67 +192,22 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
                   style: const TextStyle(fontSize: 18, height: 1.5),
                   decoration: const InputDecoration(
                     hintText: 'Start typing...',
+                    hintStyle: TextStyle(color: Colors.black38),
                     border: InputBorder.none,
                   ),
                 ),
               ),
+
+              IklanBanner(),
             ],
           ),
         ),
       ),
 
       /// Bottom Navigation seperti Apple Notes
-      bottomNavigationBar: Container(
-        height: 60,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.shade300)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.checklist, color: Color(0xffd4af37)),
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.attach_file, color: Color(0xffd4af37)),
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.camera_alt_outlined,
-                color: Color(0xffd4af37),
-              ),
-            ),
-
-            /// Tombol simpan tetap menggunakan fungsi lama
-            IconButton(
-              onPressed: () async {
-                if (widget.note == null) {
-                  await ref
-                      .read(notesProvider.notifier)
-                      .addNote(titleController.text, contentController.text);
-                } else {
-                  widget.note!.title = titleController.text;
-                  widget.note!.content = contentController.text;
-
-                  await ref
-                      .read(notesProvider.notifier)
-                      .updateNote(widget.note!);
-                }
-
-                if (mounted) {
-                  // ignore: use_build_context_synchronously
-                  context.go('/');
-                }
-              },
-              icon: const Icon(Icons.done, color: Color(0xffd4af37)),
-            ),
-          ],
-        ),
+      bottomNavigationBar: NoteBottomBar(
+        onChecklistPressed: _insertBullet,
+        onSavePressed: _saveNote,
       ),
     );
   }

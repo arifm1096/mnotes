@@ -10,8 +10,8 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const NotesPage(),
     ),
     GoRoute(
-      path: '/note-add',
-      builder: (context, state) => const AddNotePage(),
+      path: '/add-note/:id',
+      builder: (context, state) => AddNotePage(id: state.pathParameters['id']),
     ),
   ],
 );
