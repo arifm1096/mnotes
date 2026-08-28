@@ -19,12 +19,16 @@ class NoteModel extends HiveObject {
   @HiveField(4)
   DateTime updateAt;
 
+  @HiveField(5) // sesuaikan index field berikutnya
+  List<String> imagePaths;
+
   NoteModel({
     required this.id,
     required this.title,
     required this.content,
     required this.createdAt,
     required this.updateAt,
+    this.imagePaths = const [],
   });
 
 }

@@ -1,15 +1,26 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mnotes/features/notes/widgets/iklan_banner.dart';
 import 'package:mnotes/features/notes/widgets/note_bottom_bar.dart';
+import 'package:mnotes/utils/note_content_utils.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 import '../../../data/models/note_model.dart';
 import '../../../providers/notes_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:cross_file/cross_file.dart';
+import 'package:image_picker/image_picker.dart' show ImageSource, ImagePicker;
 
 class AddNotePage extends ConsumerStatefulWidget {
   final NoteModel? note;
   final String? id;
-  const AddNotePage({super.key, this.note,this.id});
+  const AddNotePage({super.key, this.note, this.id});
 
   @override
   ConsumerState<AddNotePage> createState() => _AddNotePageState();
@@ -17,84 +28,97 @@ class AddNotePage extends ConsumerStatefulWidget {
 
 class _AddNotePageState extends ConsumerState<AddNotePage> {
   final titleController = TextEditingController();
-  final contentController = TextEditingController();
+  late QuillController contentController;
+  NoteModel? _existingNote;
 
   @override
   void initState() {
     super.initState();
+    contentController = QuillController.basic();
+
     if (widget.note != null) {
+      _existingNote = widget.note;
       titleController.text = widget.note!.title;
-      contentController.text = widget.note!.content;
+
+      contentController = QuillController(
+        document: NoteContentUtils.parseContent(widget.note!.content),
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+    } else if (widget.id != null && widget.id != 'new') {
+      _loadExistingNote();
     }
   }
 
   void _loadExistingNote() {
-    if(widget.id != null && widget.id != 'new') {
+    if (widget.id != null && widget.id != 'new') {
       final notes = ref.read(notesProvider);
 
       try {
-        existingNote = notes.fir
+        final existingNote = notes.firstWhere((note) => note.id == widget.id);
+        setState(() {
+          _existingNote = existingNote;
+          titleController.text = existingNote.title;
+          contentController = QuillController(
+            document: NoteContentUtils.parseContent(existingNote.content),
+            selection: const TextSelection.collapsed(offset: 0),
+          );
+        });
+
+        print("✅ NOTE DITEMUKAN: ${existingNote.title}");
       } catch (e) {
-        
+        print("🚨 NOTE TIDAK DITEMUKAN: $e");
       }
     }
   }
 
-  void _insertBullet() {
-    final text = contentController.text;
-    final selection = contentController.selection;
-    String bulletText = '• ';
-
-    if (selection.baseOffset != -1) {
-      final start = selection.start;
-      final end = selection.end;
-      if (start > 0 && text[start - 1] != '\n') {
-        bulletText = '\n';
-      }
-      final newText = text.replaceRange(start, end, bulletText);
-      contentController.value = contentController.value.copyWith(
-        text: newText,
-        selection: TextSelection.collapsed(offset: start + bulletText.length),
-      );
+  Future<String> _saveImageLocally(XFile pickedFile) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final imageDir = Directory('${appDir.path}/note_images');
+    if (!await imageDir.exists()) {
+      await imageDir.create(recursive: true);
     }
+    final fileName = '${const Uuid().v4()}${p.extension(pickedFile.path)}';
+    final savedPath = '${imageDir.path}/$fileName';
+
+    await pickedFile.saveTo(
+      savedPath,
+    ); // XFile punya method saveTo(), bukan copy()
+
+    return savedPath;
   }
 
   Future<void> _saveNote() async {
-    // 1. Tutup keyboard terlebih dahulu untuk mencegah UI freeze saat pindah halaman
     FocusScope.of(context).unfocus();
+    final contentJson = NoteContentUtils.toJsonString(
+      contentController.document,
+    );
+    final isContentEmpty = contentController.document
+        .toPlainText()
+        .trim()
+        .isEmpty;
 
-    // 2. (Opsional) Validasi: Jangan simpan jika judul dan isi kosong
-    if (titleController.text.trim().isEmpty &&
-        contentController.text.trim().isEmpty) {
+    if (titleController.text.trim().isEmpty && isContentEmpty) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Judul atau isi catatan tidak boleh kosong'),
-          ),
-        );
+        context.go('/');
       }
-      return; // Hentikan fungsi di sini
+      return;
     }
 
     try {
-      if (widget.note == null) {
-        // Tambah Catatan Baru
+      if (_existingNote == null) {
         await ref
             .read(notesProvider.notifier)
-            .addNote(titleController.text, contentController.text);
+            .addNote(titleController.text, contentJson);
       } else {
-        // Update Catatan Lama
-        widget.note!.title = titleController.text;
-        widget.note!.content = contentController.text;
-        await ref.read(notesProvider.notifier).updateNote(widget.note!);
+        _existingNote!.title = titleController.text;
+        _existingNote!.content = contentJson;
+        await ref.read(notesProvider.notifier).updateNote(_existingNote!);
       }
 
-      // 3. Jika berhasil menyimpan, kembali ke halaman utama
       if (mounted) {
         context.go('/');
       }
     } catch (e) {
-      // 4. Tangkap error jika Hive / Provider bermasalah
       print("🚨 ERROR SAAT MENYIMPAN: $e");
 
       if (mounted) {
@@ -106,8 +130,37 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
   }
 
   @override
+  void dispose() {
+    titleController.dispose();
+    contentController.dispose();
+    super.dispose();
+  }
+
+  Future<ImageSource?> showModalImage(BuildContext context) async {
+    return await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: const Text('Ambil dari Kamera'),
+              onTap: () => Navigator.pop(ctx, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    const _colorIcon = Color(0xFFF7CB46); // Warna emas untuk ikon
+    const colorIcon = Color(0xFFF7CB46); // Warna emas untuk ikon
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -119,22 +172,20 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
           child: Container(color: Colors.black, height: 3.0),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: _colorIcon),
-          onPressed: () {
-            context.go('/');
-          },
+          icon: const Icon(Icons.arrow_back_ios, color: colorIcon),
+          onPressed: _saveNote,
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.push_pin_outlined, color: _colorIcon),
+            icon: const Icon(Icons.push_pin_outlined, color: colorIcon),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.share_outlined, color: _colorIcon),
+            icon: const Icon(Icons.share_outlined, color: colorIcon),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.more_horiz, color: _colorIcon),
+            icon: const Icon(Icons.more_horiz, color: colorIcon),
             onPressed: () {},
           ),
         ],
@@ -152,7 +203,7 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: _colorIcon,
+                  color: colorIcon,
                   border: Border.all(color: Colors.black, width: 2),
                   boxShadow: const [
                     BoxShadow(color: Colors.black, offset: Offset(3, 3)),
@@ -168,6 +219,7 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
                 ),
               ),
               const SizedBox(height: 15),
+
               /// Judul
               TextField(
                 controller: titleController,
@@ -184,16 +236,49 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
 
               /// Isi note
               Expanded(
-                child: TextField(
+                child: QuillEditor.basic(
                   controller: contentController,
-                  maxLines: null,
-                  expands: true,
-                  keyboardType: TextInputType.multiline,
-                  style: const TextStyle(fontSize: 18, height: 1.5),
-                  decoration: const InputDecoration(
-                    hintText: 'Start typing...',
-                    hintStyle: TextStyle(color: Colors.black38),
-                    border: InputBorder.none,
+                  config: QuillEditorConfig(
+                    padding: EdgeInsets.zero,
+                    embedBuilders: kIsWeb
+                        ? FlutterQuillEmbeds.editorWebBuilders()
+                        : FlutterQuillEmbeds.editorBuilders(),
+                    placeholder: 'Start typing...',
+                  ),
+                ),
+              ),
+
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: QuillSimpleToolbar(
+                  controller: contentController,
+                  config: QuillSimpleToolbarConfig(
+                    embedButtons: FlutterQuillEmbeds.toolbarButtons(
+                      imageButtonOptions: QuillToolbarImageButtonOptions(
+                        imageButtonConfig: QuillToolbarImageConfig(
+                          onRequestPickImage: (context) async {
+                            // Munculkan pilihan: Kamera atau Galeri
+                            final source = await showModalImage(context);
+
+                            if (source == null)
+                              return null; // user batal pilih sumber
+
+                            final picker = ImagePicker();
+                            final xfile = await picker.pickImage(
+                              source: source,
+                            );
+                            if (xfile == null)
+                              return null; // user batal ambil/pilih foto
+
+                            return await _saveImageLocally(xfile);
+                          },
+                        ),
+                      ),
+                    ),
+                    showFontFamily: false,
+                    showFontSize: false,
+                    showSubscript: false,
+                    showSuperscript: false,
                   ),
                 ),
               ),
@@ -206,8 +291,11 @@ class _AddNotePageState extends ConsumerState<AddNotePage> {
 
       /// Bottom Navigation seperti Apple Notes
       bottomNavigationBar: NoteBottomBar(
-        onChecklistPressed: _insertBullet,
+        onChecklistPressed: () {
+          contentController.formatSelection(Attribute.ul); // toggle bullet list
+        },
         onSavePressed: _saveNote,
+        onImagePressed: () => showModalImage(context),
       ),
     );
   }

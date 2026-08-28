@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 class NoteBottomBar extends StatelessWidget {
   final VoidCallback onChecklistPressed;
   final VoidCallback onSavePressed;
+  final VoidCallback onImagePressed;
   Color get _colorIcon => Color(0xFFF7CB46);
 
   const NoteBottomBar({
     super.key,
     required this.onChecklistPressed,
     required this.onSavePressed,
+    required this.onImagePressed,
   });
 
   @override
@@ -30,16 +32,13 @@ class NoteBottomBar extends StatelessWidget {
             icon: Icon(Icons.checklist, color: _colorIcon),
           ),
           IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.attach_file, color: _colorIcon),
-          ),
-          IconButton(
-            onPressed: () {},
+            onPressed: onChecklistPressed,
             icon: Icon(Icons.camera_alt_outlined, color: _colorIcon),
           ),
           IconButton(
             onPressed: onSavePressed,
             icon: Icon(Icons.done, color: _colorIcon),
+            tooltip: 'Simpan',
           ),
         ],
       ),

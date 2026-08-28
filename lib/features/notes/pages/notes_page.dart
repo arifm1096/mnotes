@@ -69,7 +69,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF6FA8FF),
+                color: const Color.fromARGB(255, 136, 155, 133),
                 borderRadius: BorderRadius.circular(1.0),
                 border: Border.all(
                   color: const Color.fromARGB(255, 0, 0, 0),
@@ -81,10 +81,10 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Tidak ada catatan',
+                    'Notes Not Found',
                     style: TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: Color.fromARGB(255, 0, 0, 0),
                     ),
                   ),
@@ -103,7 +103,12 @@ class _NotesPageState extends ConsumerState<NotesPage> {
       appBar: AppBar(
         title: const Text(
           'My Notes',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 32),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 32,
+            color: Color.fromARGB(255, 27, 27, 27),
+            fontFamily: 'Poppins',
+          ),
         ),
         elevation: 0,
         backgroundColor: Colors.white,
@@ -141,9 +146,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
         ),
       ),
 
-      // Konfigurasi FAB yang baru
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      // ✅ 1. BUNGKUS FAB DENGAN PADDING AGAR NAIK SEDIKIT DARI IKLAN
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 10.0),
         child: SizedBox(
@@ -151,7 +154,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
           height: 50,
           child: InkWell(
             onTap: () {
-              context.go('/note-add');
+              context.go('/add-note/new');
             },
             child: Stack(
               children: [
@@ -177,7 +180,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                     width: 140,
                     height: 47,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF7CB46),
+                      color: const Color.fromARGB(255, 136, 155, 133),
                       borderRadius: BorderRadius.zero,
                       border: Border.all(color: Colors.black, width: 2),
                     ),
@@ -207,13 +210,8 @@ class _NotesPageState extends ConsumerState<NotesPage> {
         ),
       ),
 
-      // ✅ 2. KUNCI TINGGI BOTTOM NAVIGATION BAR
       bottomNavigationBar: const SafeArea(
-        child: SizedBox(
-          height:
-              55, // Standar tinggi banner AdMob, mengunci ruang agar UI tidak crash
-          child: IklanBanner(),
-        ),
+        child: SizedBox(height: 55, child: IklanBanner()),
       ),
     );
   }

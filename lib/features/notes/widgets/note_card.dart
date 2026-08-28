@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mnotes/utils/note_content_utils.dart';
 import '../../../data/models/note_model.dart';
 import '../../../providers/notes_provider.dart';
 
@@ -118,7 +119,7 @@ class NoteCard extends ConsumerWidget {
                   const SizedBox(height: 10),
 
                   Text(
-                    shortContent(note.content),
+                    NoteContentUtils.plainTextPreview(note.content),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

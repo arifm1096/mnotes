@@ -20,7 +20,7 @@ class SearchWidget extends ConsumerWidget {
       child: Container(
         height: 50, // Sesuaikan tinggi sesuai keinginan Anda
         decoration: BoxDecoration(
-          color: const Color(0xFFF7CB46), // Gunakan warna pink cerah sesuai gambar
+          color: const Color.fromARGB(255, 255, 255, 255), // Gunakan warna pink cerah sesuai gambar
           borderRadius: BorderRadius.circular(borderRadius),
           border: Border.all(color: Colors.black, width: 2), // Border hitam pekat
           boxShadow: [
@@ -49,7 +49,7 @@ class SearchWidget extends ConsumerWidget {
               color: Colors.black, // Warna ikon kontras
             ),
             hintText: 'Search Notes',
-            hintStyle: TextStyle(color: Colors.black54),
+            hintStyle: TextStyle(color: Colors.black54, fontFamily: 'montserrat'),
           ),
         ),
       ),
